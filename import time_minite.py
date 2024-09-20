@@ -32,13 +32,13 @@ loss_threshold_after_final_buy = -3  # 매도 조건 2: 최종 매수 단계 이
 
 # 추가 매수 조건 설정 (각 단계별 관리)
 additional_buy_conditions = [
-    {"trigger_loss": -2, "buy_ratio": 0.01},  # 2단계: 손실률이 -2% 이하일 때 1% 매수
-    {"trigger_loss": -4, "buy_ratio": 0.015},  # 3단계: 손실률이 -4% 이하일 때 1.5% 매수
-    {"trigger_loss": -6, "buy_ratio": 0.02},  # 4단계: 손실률이 -6% 이하일 때 2% 매수
-    {"trigger_loss": -8, "buy_ratio": 0.025},  # 5단계: 손실률이 -8% 이하일 때 2.5% 매수
-    {"trigger_loss": -10, "buy_ratio": 0.03},  # 6단계: 손실률이 -10% 이하일 때 3% 매수
-    {"trigger_loss": -12, "buy_ratio": 0.035},  # 7단계: 손실률이 -12% 이하일 때 3.5% 매수
-    {"trigger_loss": -15, "buy_ratio": 0.04},  # 8단계: 손실률이 -15% 이하일 때 4% 매수
+    {"trigger_loss": -1, "buy_ratio": 0.01},  # 2단계: 손실률이 -2% 이하일 때 1% 매수
+    {"trigger_loss": -2, "buy_ratio": 0.015},  # 3단계: 손실률이 -4% 이하일 때 1.5% 매수
+    {"trigger_loss": -3, "buy_ratio": 0.02},  # 4단계: 손실률이 -6% 이하일 때 2% 매수
+    {"trigger_loss": -4, "buy_ratio": 0.025},  # 5단계: 손실률이 -8% 이하일 때 2.5% 매수
+    {"trigger_loss": -5, "buy_ratio": 0.03},  # 6단계: 손실률이 -10% 이하일 때 3% 매수
+    {"trigger_loss": -6, "buy_ratio": 0.035},  # 7단계: 손실률이 -12% 이하일 때 3.5% 매수
+    {"trigger_loss": -7, "buy_ratio": 0.04},  # 8단계: 손실률이 -15% 이하일 때 4% 매수
 ]
 
 def get_balance(currency):
