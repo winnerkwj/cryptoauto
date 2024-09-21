@@ -27,7 +27,7 @@ k_value = 0.7  # 변동성 돌파 전략에서 사용할 k 값
 initial_buy_percent = 0.01  # 초기 매수 시 원화 잔고의 몇 퍼센트를 사용할지 설정
 
 # 매도 조건 설정
-profit_threshold = 1  # 매도 조건 1: 수익률이 이 값 이상일 때 매도
+profit_threshold = 0.1  # 매도 조건 0.1: 수익률이 이 값 이상일 때 매도
 loss_threshold_after_final_buy = -3  # 매도 조건 2: 최종 매수 단계 이후 손실률이 이 값 이하일 때 매도
 
 # 추가 매수 조건 설정 (각 단계별 관리)
