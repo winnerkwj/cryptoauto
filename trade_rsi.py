@@ -46,7 +46,7 @@ loss_threshold_after_final_buy = -3  # 최종 매수 이후 손실이 -3%일 때
 # **추가 매수 조건 설정**
 # 손실률에 따라 추가 매수할 비율을 정의합니다. 손실이 커질수록 더 많은 양을 추가 매수합니다.
 additional_buy_conditions = [
-    {"trigger_loss": -2, "buy_ratio": 0.01},    # 손실률 -2%일 때 추가 매수 1%
+    {"trigger_loss": -1, "buy_ratio": 0.01},    # 손실률 -2%일 때 추가 매수 1%
     {"trigger_loss": -4, "buy_ratio": 0.015},   # 손실률 -4%일 때 추가 매수 1.5%
     {"trigger_loss": -6, "buy_ratio": 0.02},    # 손실률 -6%일 때 추가 매수 2%
     {"trigger_loss": -8, "buy_ratio": 0.025},   # 손실률 -8%일 때 추가 매수 2.5%
