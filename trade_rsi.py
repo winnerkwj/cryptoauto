@@ -36,13 +36,13 @@ loss_threshold_after_final_buy = -2  # 손실률이 -2% 이하일 때 매도
 
 # 추가 매수 조건 설정 (-1% 이상에서만 추가 매수 실행)
 additional_buy_conditions = [
-    {"trigger_loss": -1, "buy_ratio": 0.01},
-    {"trigger_loss": -1, "buy_ratio": 0.015},
-    {"trigger_loss": -1, "buy_ratio": 0.02},
-    {"trigger_loss": -1, "buy_ratio": 0.025},
-    {"trigger_loss": -1, "buy_ratio": 0.03},
-    {"trigger_loss": -1, "buy_ratio": 0.035},
-    {"trigger_loss": -1, "buy_ratio": 0.04},
+    {"trigger_loss": -1.2, "buy_ratio": 0.01},
+    {"trigger_loss": -1.2, "buy_ratio": 0.015},
+    {"trigger_loss": -1.3, "buy_ratio": 0.02},
+    {"trigger_loss": -1.3, "buy_ratio": 0.025},
+    {"trigger_loss": -1.4, "buy_ratio": 0.03},
+    {"trigger_loss": -1.4, "buy_ratio": 0.035},
+    {"trigger_loss": -1.5, "buy_ratio": 0.04},
 ]
 
 # 잔고 조회 함수
