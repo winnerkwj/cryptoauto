@@ -31,7 +31,7 @@ rsi_period = 14
 rsi_threshold = 30
 initial_buy_percent = 0.01
 
-profit_threshold = 0.3  # 수익률이 0.3% 이상일 때 매도
+profit_threshold = 0.5  # 수익률이 0.5% 이상일 때 매도
 loss_threshold_after_final_buy = -2  # 손실률이 -2% 이하일 때 매도
 
 # 추가 매수 조건 설정 (-1% 이상에서만 추가 매수 실행)
