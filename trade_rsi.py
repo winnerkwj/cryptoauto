@@ -2,18 +2,18 @@ import time
 import numpy as np
 import pyupbit
 
-# **API 키 설정**
+# API 키 설정
 key_file_path = r'C:\Users\winne\OneDrive\바탕 화면\upbit_key.txt'
 
-# **API 키 읽기**
+# API 키 읽기
 with open(key_file_path, 'r') as file:
     access = file.readline().strip()
     secret = file.readline().strip()
 
-# **거래할 암호화폐 종목 설정**
+# 거래할 암호화폐 종목 설정
 tickers = ["KRW-BTC", "KRW-ETH", "KRW-XRP", "KRW-EOS", "KRW-ADA", "KRW-DOGE", "KRW-LOOM", "KRW-SHIB", "KRW-DOGE", "KRW-NEO", "KRW-ARDR", "KRW-GAS", "KRW-HBAR", "KRW-STPT"]
 
-# **종목별 거래 상태 관리 딕셔너리 초기화**
+# 종목별 거래 상태 관리 딕셔너리 초기화
 trade_state = {ticker: {
     "buy1_price": None,
     "buy2_executed": False,
@@ -25,16 +25,16 @@ trade_state = {ticker: {
     "sell_executed": False
 } for ticker in tickers}
 
-# **사용자 설정 변수들**
-interval = "minute1"  
-rsi_period = 14  
-rsi_threshold = 30  
-initial_buy_percent = 0.01  
+# 사용자 설정 변수들
+interval = "minute1"
+rsi_period = 14
+rsi_threshold = 30
+initial_buy_percent = 0.01
 
-profit_threshold = 0.29  
-loss_threshold_after_final_buy = -2  
+profit_threshold = 0.29
+loss_threshold_after_final_buy = -2
 
-# **추가 매수 조건 설정**
+# 추가 매수 조건 설정
 additional_buy_conditions = [
     {"trigger_loss": -1, "buy_ratio": 0.01},
     {"trigger_loss": -1, "buy_ratio": 0.015},
@@ -45,8 +45,9 @@ additional_buy_conditions = [
     {"trigger_loss": -1, "buy_ratio": 0.04},
 ]
 
-# **잔고 조회 함수**
+# 잔고 조회 함수
 def get_balance(currency):
+    time.sleep(1/30)  # 초당 30회 제한을 준수하기 위해 딜레이 추가
     balances = upbit.get_balances()
     for b in balances:
         if b['currency'] == currency:
@@ -56,24 +57,27 @@ def get_balance(currency):
                 return 0
     return 0
 
-# **암호화폐 매수 함수**
+# 암호화폐 매수 함수
 def buy_crypto(ticker, amount):
+    time.sleep(1/8)  # 초당 8회 제한을 준수하기 위해 딜레이 추가
     try:
         return upbit.buy_market_order(ticker, amount)
     except Exception as e:
         print(f"{ticker} 매수 오류 발생: {e}")
         return None
 
-# **암호화폐 매도 함수**
+# 암호화폐 매도 함수
 def sell_crypto(ticker, amount):
+    time.sleep(1/8)  # 초당 8회 제한을 준수하기 위해 딜레이 추가
     try:
         return upbit.sell_market_order(ticker, amount)
     except Exception as e:
         print(f"{ticker} 매도 오류 발생: {e}")
         return None
 
-# **현재 가격 조회 함수**
+# 현재 가격 조회 함수
 def safe_get_current_price(ticker):
+    time.sleep(1/30)  # 초당 30회 제한을 준수하기 위해 딜레이 추가
     try:
         price = pyupbit.get_current_price(ticker)
         if price is None:
@@ -84,55 +88,41 @@ def safe_get_current_price(ticker):
         print(f"{ticker}의 현재 가격 조회 중 오류 발생: {e}")
         return None
 
-# **안전한 OHLCV 데이터 가져오기 함수**
-def get_safe_ohlcv(ticker, interval="minute1", count=15, retry_count=3, max_delay=10):
-    """재시도 시간을 특정 시간 이상 넘기지 않도록 제한"""
-    total_wait_time = 0
-    delay = 1
-    for _ in range(retry_count):
-        try:
-            df = pyupbit.get_ohlcv(ticker, interval=interval, count=count)
-            if df is not None and not df.empty:
-                return df
-            print(f"{ticker} 데이터 없음, 재시도 중...")
-        except Exception as e:
-            print(f"{ticker} 데이터 가져오기 오류 발생: {e}, 재시도 중...")
-
-        total_wait_time += delay
-        if total_wait_time >= max_delay:
-            print(f"{ticker} 데이터 재시도 시간이 너무 길어 중단합니다.")
-            break
-        time.sleep(delay)
-        delay *= 2  # 재시도 간격을 두 배로 늘리기
+# 안전한 OHLCV 데이터 가져오기 함수 (1분봉 데이터)
+def get_safe_ohlcv(ticker, interval="minute1", count=15):
+    time.sleep(1/30)  # 초당 30회 제한을 준수하기 위해 딜레이 추가
+    try:
+        df = pyupbit.get_ohlcv(ticker, interval=interval, count=count)
+        if df is not None and not df.empty:
+            return df
+        print(f"{ticker} 데이터 없음, 재시도 중...")
+    except Exception as e:
+        print(f"{ticker} 데이터 가져오기 오류 발생: {e}")
     return None
 
-# **RSI 계산 함수**
+# RSI 계산 함수
 def calculate_rsi(ticker, period=rsi_period, interval=interval):
-    try:
-        df = get_safe_ohlcv(ticker, interval=interval, count=period + 1)
-        if df is None:
-            print(f"{ticker}의 {interval} 데이터를 가져올 수 없습니다.")
-            return None
-
-        delta = df['close'].diff()
-        gain = np.where(delta > 0, delta, 0)
-        loss = np.where(delta < 0, -delta, 0)
-
-        avg_gain = np.mean(gain[-period:])
-        avg_loss = np.mean(loss[-period:])
-
-        if avg_loss == 0:
-            return 100
-
-        rs = avg_gain / avg_loss
-        rsi = 100 - (100 / (1 + rs))
-
-        return rsi
-    except Exception as e:
-        print(f"{ticker}의 {interval} RSI 계산 오류 발생: {e}")
+    df = get_safe_ohlcv(ticker, interval=interval, count=period + 1)
+    if df is None:
+        print(f"{ticker}의 {interval} 데이터를 가져올 수 없습니다.")
         return None
 
-# **RSI 매수 신호 감지 함수**
+    delta = df['close'].diff()
+    gain = np.where(delta > 0, delta, 0)
+    loss = np.where(delta < 0, -delta, 0)
+
+    avg_gain = np.mean(gain[-period:])
+    avg_loss = np.mean(loss[-period:])
+
+    if avg_loss == 0:
+        return 100
+
+    rs = avg_gain / avg_loss
+    rsi = 100 - (100 / (1 + rs))
+
+    return rsi
+
+# RSI 매수 신호 감지 함수
 def detect_rsi_buy_signal(ticker, rsi_threshold=rsi_threshold, interval=interval):
     rsi = calculate_rsi(ticker, interval=interval)
     if rsi is None:
@@ -145,7 +135,7 @@ def detect_rsi_buy_signal(ticker, rsi_threshold=rsi_threshold, interval=interval
         print(f"{ticker}: RSI 매수 신호 미충족 - RSI 값: {rsi:.2f}")
         return False
 
-# **RSI 매수 신호 감지 후 초기 매수 실행 함수**
+# RSI 매수 신호 감지 후 초기 매수 실행 함수
 def execute_buy_on_rsi_signal(ticker):
     if detect_rsi_buy_signal(ticker):
         buy_amount = krw_balance * initial_buy_percent
@@ -156,7 +146,7 @@ def execute_buy_on_rsi_signal(ticker):
             print(f"{ticker} RSI 매수 완료: 가격: {trade_state[ticker]['buy1_price']} KRW")
         time.sleep(3)
 
-# **단일 티커에 대한 매수/매도 로직 실행 함수**
+# 단일 티커에 대한 매수/매도 로직 실행 함수
 def trade_single_ticker(ticker):
     current_price = safe_get_current_price(ticker)
     if current_price is None:
@@ -198,17 +188,25 @@ def trade_single_ticker(ticker):
                     print(f"{ticker} 추가 매수 {i+2} 완료: {buy_amount} KRW 매수")
                 time.sleep(3)
 
-# **업비트 로그인**
+# 업비트 로그인
 upbit = pyupbit.Upbit(access, secret)
 print("자동 거래 시작")
 
-# **Step 1: 초기 구매 결정**
+# Step 1: 초기 구매 결정
 krw_balance = get_balance("KRW")
-for ticker in tickers:
-    execute_buy_on_rsi_signal(ticker)
 
-# **Step 2: 각 티커에 대해 개별 거래 실행**
+# Step 2: 각 티커에 대해 1분마다 거래 실행
 while True:
+    start_time = time.time()
+    
     for ticker in tickers:
+        # 각 티커의 1분봉 데이터를 가져오고 매매 신호를 확인
+        print(f"{ticker}의 데이터를 확인합니다.")
+        execute_buy_on_rsi_signal(ticker)
         trade_single_ticker(ticker)
-        time.sleep(10)  # 한 종목을 처리한 후 10초 대기
+        time.sleep(1)  # 각 종목 처리 후 1초 대기 (API 호출 제한 준수)
+
+    # 1분이 지나기 전까지 대기 (60초에서 남은 시간을 대기)
+    elapsed_time = time.time() - start_time
+    if elapsed_time < 60:
+        time.sleep(60 - elapsed_time)
