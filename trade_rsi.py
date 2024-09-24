@@ -11,7 +11,7 @@ with open(key_file_path, 'r') as file:
     secret = file.readline().strip()
 
 # 거래할 암호화폐 종목 설정
-tickers = ["KRW-BTC", "KRW-ETH", "KRW-XRP", "KRW-EOS", "KRW-ADA", "KRW-DOGE", "KRW-LOOM", "KRW-SHIB", "KRW-DOGE", "KRW-NEO", "KRW-ARDR", "KRW-GAS", "KRW-HBAR", "KRW-STPT", "KRW-UXLINK","KRW-CKB","KRW-IQ"]
+tickers = ["KRW-BTC", "KRW-ETH", "KRW-XRP", "KRW-EOS", "KRW-ADA", "KRW-DOGE", "KRW-LOOM", "KRW-SHIB", "KRW-DOGE", "KRW-NEO", "KRW-ARDR", "KRW-GAS", "KRW-HBAR", "KRW-STPT", "KRW-UXLINK","KRW-CKB","KRW-IQ","KRW-ZETA"]
 
 # 종목별 거래 상태 관리 딕셔너리 초기화
 trade_state = {ticker: {
