@@ -11,7 +11,7 @@ with open(key_file_path, 'r') as file:
     secret = file.readline().strip()
 
 # 거래할 암호화폐 종목 설정
-tickers = ["KRW-BTC", "KRW-ETH", "KRW-XRP", "KRW-EOS", "KRW-ADA", "KRW-DOGE", "KRW-LOOM", "KRW-SHIB", "KRW-DOGE", "KRW-NEO", "KRW-ARDR", "KRW-GAS", "KRW-HBAR", "KRW-STPT"]
+tickers = ["KRW-BTC", "KRW-ETH", "KRW-XRP", "KRW-EOS", "KRW-ADA", "KRW-DOGE", "KRW-LOOM", "KRW-SHIB", "KRW-DOGE", "KRW-NEO", "KRW-ARDR", "KRW-GAS", "KRW-HBAR", "KRW-STPT", "KRW-UXLINK","KRW-CKB","KRW-IQ"]
 
 # 종목별 거래 상태 관리 딕셔너리 초기화
 trade_state = {ticker: {
@@ -31,10 +31,10 @@ rsi_period = 14
 rsi_threshold = 30
 initial_buy_percent = 0.01
 
-profit_threshold = 0.29
-loss_threshold_after_final_buy = -2
+profit_threshold = 0.3  # 수익률이 0.3% 이상일 때 매도
+loss_threshold_after_final_buy = -2  # 손실률이 -2% 이하일 때 매도
 
-# 추가 매수 조건 설정
+# 추가 매수 조건 설정 (-1% 이상에서만 추가 매수 실행)
 additional_buy_conditions = [
     {"trigger_loss": -1, "buy_ratio": 0.01},
     {"trigger_loss": -1, "buy_ratio": 0.015},
@@ -156,7 +156,7 @@ def trade_single_ticker(ticker):
     if buy1_price is not None:
         profit_rate = ((current_price - buy1_price) / buy1_price) * 100
 
-        # 매도 조건 1: 수익률이 설정된 값 이상일 때 전체 매도
+        # 매도 조건 1: 수익률이 설정된 값 이상일 때 전체 매도 (0.3% 이상)
         if profit_rate >= profit_threshold and not trade_state[ticker]['sell_executed']:
             trade_state[ticker]['sell_executed'] = True
             crypto_balance = get_balance(ticker.split("-")[1])
@@ -166,7 +166,7 @@ def trade_single_ticker(ticker):
                 trade_state[ticker]['sell_executed'] = False
             time.sleep(3)
 
-        # 매도 조건 2: 최종 매수 이후 손실률이 설정된 값 이하일 때 매도
+        # 매도 조건 2: 최종 매수 이후 손실률이 설정된 값 이하일 때 매도 (-2% 이하)
         if trade_state[ticker]['buy7_executed'] and profit_rate <= loss_threshold_after_final_buy and not trade_state[ticker]['sell_executed']:
             trade_state[ticker]['sell_executed'] = True
             crypto_balance = get_balance(ticker.split("-")[1])
@@ -176,7 +176,7 @@ def trade_single_ticker(ticker):
                 trade_state[ticker]['sell_executed'] = False
             time.sleep(3)
 
-        # 추가 매수 조건
+        # 추가 매수 조건 (-1% 이하일 때 추가 매수 실행)
         for i, condition in enumerate(additional_buy_conditions):
             if (profit_rate <= condition['trigger_loss'] and detect_rsi_buy_signal(ticker)
                     and not trade_state[f'buy{i+2}_executed'] and i < 7):
