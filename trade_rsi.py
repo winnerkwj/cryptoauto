@@ -2,6 +2,9 @@ import time
 import numpy as np
 import pyupbit
 
+# 최소 거래 금액 설정
+MIN_TRADE_AMOUNT = 500  # 최소 거래 금액 500 KRW
+
 # API 키 설정
 key_file_path = r'C:\Users\winne\OneDrive\바탕 화면\upbit_key.txt'
 
@@ -39,17 +42,17 @@ rsi_threshold = 30
 initial_buy_percent = 0.01
 
 profit_threshold = 0.3  # 수익률이 0.3% 이상일 때 매도
-loss_threshold_after_final_buy = -2  # 손실률이 -2% 이하일 때 매도
+loss_threshold_after_final_buy = -3  # 손실률이 -3% 이하일 때 매도
 
 # 추가 매수 조건 설정
 additional_buy_conditions = [
     {"trigger_loss": -1, "buy_ratio": 0.01},
-    {"trigger_loss": -1.5, "buy_ratio": 0.015},
-    {"trigger_loss": -2, "buy_ratio": 0.02},
-    {"trigger_loss": -2.5, "buy_ratio": 0.025},
-    {"trigger_loss": -3, "buy_ratio": 0.03},
-    {"trigger_loss": -3.5, "buy_ratio": 0.035},
-    {"trigger_loss": -4, "buy_ratio": 0.04},
+    {"trigger_loss": -1, "buy_ratio": 0.015},
+    {"trigger_loss": -1, "buy_ratio": 0.02},
+    {"trigger_loss": -1, "buy_ratio": 0.025},
+    {"trigger_loss": -1, "buy_ratio": 0.03},
+    {"trigger_loss": -1, "buy_ratio": 0.035},
+    {"trigger_loss": -1, "buy_ratio": 0.04},
 ]
 
 # 잔고 조회 함수
@@ -64,8 +67,11 @@ def get_balance(currency):
                 return 0
     return 0
 
-# 암호화폐 지정가 매수 함수
+# 암호화폐 지정가 매수 함수 (최소 거래 금액 확인)
 def buy_crypto(ticker, amount):
+    if amount < MIN_TRADE_AMOUNT:
+        print(f"{ticker} 매수 금액 {amount} KRW는 최소 거래 금액 {MIN_TRADE_AMOUNT} KRW 이하입니다.")
+        return None
     time.sleep(1/8)
     try:
         return upbit.buy_market_order(ticker, amount)
@@ -73,8 +79,12 @@ def buy_crypto(ticker, amount):
         print(f"{ticker} 매수 오류 발생: {e}")
         return None
 
-# 암호화폐 지정가 매도 함수 (전량 매도)
+# 암호화폐 지정가 매도 함수 (최소 거래 금액 확인)
 def sell_crypto(ticker, price, amount):
+    total_amount = price * amount
+    if total_amount < MIN_TRADE_AMOUNT:
+        print(f"{ticker} 매도 금액 {total_amount} KRW는 최소 거래 금액 {MIN_TRADE_AMOUNT} KRW 이하입니다.")
+        return None
     time.sleep(1/8)
     try:
         return upbit.sell_limit_order(ticker, price, amount)  # 지정가 매도 주문
